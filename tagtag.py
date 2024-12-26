@@ -1,11 +1,12 @@
 import subprocess
 import os
 import tempfile
-import shutil 
+import shutil
 
-# Set the path to your Git repository and version.h file
-GIT_REPO_PATH = "git_learn"  # Update this with your actual path
-VERSION_FILE_PATH = os.path.join( "version.sh")
+# Set paths
+GIT_REPO_PATH = "git_learn"  # Update this with your actual repo path
+VERSION_SCRIPT_PATH = os.path.join(GIT_REPO_PATH, "version.sh")
+VERSION_FILE_PATH = os.path.join(GIT_REPO_PATH, "Product", "DataBase", "version.h")
 
 def run_shell_command(command, cwd=None):
     """Runs a shell command and returns the output."""
@@ -16,27 +17,34 @@ def run_shell_command(command, cwd=None):
         print(f"Error: {e.stderr.decode('utf-8')}")
         return None
 
-def extract_version_and_tag(version_file_path):
-    """Extracts the PRODUCT_TAG and PRODUCT_VERSION from version.h."""
-    try:
-        with open(version_file_path, 'r') as f:
-            content = f.read()
-            tag_name = subprocess.getoutput(f"echo '{content}' | grep PRODUCT_TAG | sed 's/^[^\\\"]*\"([^\"]*)\"/\\1/'")
-            version = subprocess.getoutput(f"echo '{content}' | grep PRODUCT_VERSION | sed 's/^[^\\\"]*\"([^\"]*)\"/\\1/'")
-            return tag_name.strip(), version.strip()
-    except Exception as e:
-        print(f"Error reading {version_file_path}: {e}")
+def generate_version_file():
+    """Executes the version.sh script to generate the version.h file."""
+    print("Generating version.h by executing version.sh...")
+    run_shell_command(f"bash {VERSION_SCRIPT_PATH}")
+
+def extract_version_and_tag():
+    """Extracts PRODUCT_TAG and PRODUCT_VERSION from version.h."""
+    if not os.path.exists(VERSION_FILE_PATH):
+        print(f"Error: {VERSION_FILE_PATH} does not exist.")
         return None, None
+    
+    tag_name, version = None, None
+    with open(VERSION_FILE_PATH, "r") as file:
+        for line in file:
+            if line.startswith("#define PRODUCT_TAG"):
+                tag_name = line.split("\"")[1].strip()
+            elif line.startswith("#define PRODUCT_VERSION"):
+                version = line.split("\"")[1].strip()
+    return tag_name, version
 
 def create_tag_annotation(tag_name, version, repo_name):
     """Creates a temporary file and fills it with the tag annotation."""
     try:
         tmp_file = tempfile.mktemp()
-        with open(tmp_file, 'w') as f:
+        with open(tmp_file, "w") as f:
             f.write(f"Annotation for tag {tag_name}\n")
-            f.write(f"associated with version {version} of product {repo_name}\n\n")
+            f.write(f"Associated with version {version} of product {repo_name}\n\n")
             f.write("<Provide tag annotation details and then save and exit the editor>")
-        
         return tmp_file
     except Exception as e:
         print(f"Error creating temporary file for tag annotation: {e}")
@@ -45,12 +53,8 @@ def create_tag_annotation(tag_name, version, repo_name):
 def edit_tag_annotation(tmp_file):
     """Opens the temporary file in the default editor for user input."""
     try:
-        # Check if Notepad is available (for Windows users)
-        if shutil.which("notepad"):
-            subprocess.run(["notepad", tmp_file], check=True)
-        else:
-            # For other systems, use vi as default
-            subprocess.run(["vi", tmp_file], check=True)
+        editor = shutil.which("notepad") if os.name == "nt" else "vi"
+        subprocess.run([editor, tmp_file], check=True)
         return True
     except Exception as e:
         print(f"Error opening editor: {e}")
@@ -66,8 +70,11 @@ def tag_repo(tmp_file, tag_name):
         print(f"Error during tagging operation: {e}")
 
 def main():
+    # Generate version.h
+    generate_version_file()
+    
     # Extract the tag name and version from version.h
-    tag_name, version = extract_version_and_tag(VERSION_FILE_PATH)
+    tag_name, version = extract_version_and_tag()
     if not tag_name or not version:
         print("Failed to extract tag name or version from version.h.")
         return
@@ -89,7 +96,7 @@ def main():
         return
 
     # Check if the annotation was modified before saving
-    with open(tmp_file, 'r') as f:
+    with open(tmp_file, "r") as f:
         annotation = f.read()
         if "<Provide tag annotation details and then save and exit the editor>" in annotation:
             print("Error: Tag annotation was not modified.")
