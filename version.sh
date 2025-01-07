@@ -14,10 +14,13 @@ OUTFILE=DataBase/version.h
 
 # generate the tag name as a project name and date stamp
 TIME_STAMP=$(date --utc +%Y%m%d_%H%M%S)
-REPO_NAME=TM91
+REPO_NAME=TM9101
 PROD_DATE=$(echo $TIME_STAMP | sed 's/^\([0-9]*\)_[0-9]*/\1/' -)
 PROD_TIME=$(echo $TIME_STAMP | sed 's/^[0-9]*_\([0-9]*\)/\1/' -)
-PROD_VER=${REPO_NAME}_${PROD_DATE}_${PROD_TIME}
+verNo=$(echo $1 | sed 's/\./_/g')
+PROD_VER=${REPO_NAME}_${PROD_DATE}_${PROD_TIME}_${verNo}
+
+
 echo "Product version string is \"${REPO_NAME}_${PROD_DATE}_${PROD_TIME}\""
 
 echo "// @file version.h" > $OUTFILE

@@ -1,0 +1,17 @@
+*.xcl
+settings
+*.exe
+*.out
+*.sim
+*.o
+*.i
+*.pbi
+*.browse
+*.pbd
+*.linf
+*.dep
+*.vpwhist
+*.vtg
+*.ewd
+*.lst
+*.tmp
