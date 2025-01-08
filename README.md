@@ -78,6 +78,11 @@ python script.py 1.0.0
 - `tag_repo(tag_name: str, version: str, repo_name: str) -> None`
   - Tags the repository with an annotated tag and pushes the tag.
 
+## Code execution flow 
+
+![Image Description](./Screenshot%202025-01-08%20161521.png)
+
+
 ## Error Handling
 - Handles errors during shell command execution and file operations.
 
