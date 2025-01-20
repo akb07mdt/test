@@ -2,12 +2,12 @@
 //
 // Holds Version Strings for this product.
 //
-// Use the tag TM9101_20250107_164948_192_168_12_104
+// Use the tag TM9101_20250120_180920_2_3_1
 // to checkout code associated with this version.
 //
 
 #define PRODUCT_NAME    TM9101
-#define PRODUCT_DATE    20250107
-#define PRODUCT_TIME    164948
-#define PRODUCT_TAG     TM9101_20250107_164948_192_168_12_104
-#define PRODUCT_VERSION 192.168.12.104
+#define PRODUCT_DATE    20250120
+#define PRODUCT_TIME    180920
+#define PRODUCT_TAG     TM9101_20250120_180920_2_3_1
+#define PRODUCT_VERSION 2.3.1
